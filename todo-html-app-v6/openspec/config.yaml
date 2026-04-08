@@ -1,0 +1,31 @@
+# openspec/config.yaml
+schema: spec-driven
+
+context: |
+  Project: Simple one-page HTML Todo App
+  A lightweight, self-contained todo application delivered as a single HTML file with no build step or external dependencies.
+
+  Tech stack: HTML5, CSS3, vanilla JavaScript (ES6+)
+  Architecture: Single-file HTML app — all markup, styles, and scripts in src/index.html
+
+  Features:
+    - Add new todo items
+    - Mark items as complete/incomplete
+    - Delete individual items
+    - Filter by status: All, Active, Completed
+    - Item count display (e.g. "3 items left")
+    - Persist todos in localStorage so they survive page refresh
+
+  Constraints:
+    - No frameworks, no npm, no build tools
+    - Everything in a single src/index.html file
+    - Must work by opening the file directly in a browser (file:// protocol)
+
+rules:
+  specs:
+    - Use Given/When/Then format for all scenarios
+    - Cover happy path and edge cases (empty list, all complete, etc.)
+  tasks:
+    - Break into small, atomic steps
+    - Each task targets a single feature or UI section
+    - All output files must live under src/

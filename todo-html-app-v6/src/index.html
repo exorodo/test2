@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>todos</title>
+
+  <!-- === STYLES === -->
+  <style>
+    /* Reset */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Base */
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #f0f2f5;
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 16px;
+    }
+
+    /* Card container */
+    main {
+      width: 100%;
+      max-width: 520px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.10);
+      padding: 32px 28px 24px;
+    }
+
+    h1 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: #c0392b;
+      text-align: center;
+      letter-spacing: 0.08em;
+      margin-bottom: 24px;
+      opacity: 0.85;
+    }
+
+    /* Input row */
+    .input-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    #new-todo {
+      flex: 1;
+      padding: 10px 14px;
+      border: 1.5px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+      color: #333;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+
+    #new-todo::placeholder {
+      color: #aaa;
+    }
+
+    #new-todo:focus {
+      border-color: #c0392b;
+    }
+
+    #add-btn {
+      padding: 10px 18px;
+      background: #c0392b;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    #add-btn:hover {
+      background: #a93226;
+    }
+
+    #add-btn:active {
+      background: #922b21;
+    }
+
+    /* Todo list */
+    #todo-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    #todo-list li {
+      padding: 12px 4px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 1rem;
+      color: #333;
+    }
+
+    #todo-list li:last-child {
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- === MARKUP === -->
+  <main>
+    <h1>todos</h1>
+
+    <div class="input-row">
+      <input
+        type="text"
+        id="new-todo"
+        aria-label="New todo"
+        placeholder="What needs to be done?"
+        autocomplete="off"
+      >
+      <button id="add-btn">Add</button>
+    </div>
+
+    <ul id="todo-list"></ul>
+  </main>
+
+  <!-- === SCRIPT === -->
+  <script>
+    // ── State ──────────────────────────────────────────────────────────────
+    let todos = [];
+
+    function createTodo(text) {
+      return {
+        id: crypto.randomUUID(),
+        text: text.trim(),
+        completed: false,
+        createdAt: new Date().toISOString(),
+      };
+    }
+
+    // ── Render ─────────────────────────────────────────────────────────────
+    function render() {
+      const list = document.getElementById('todo-list');
+      list.innerHTML = '';
+      todos.forEach(todo => {
+        const li = document.createElement('li');
+        li.textContent = todo.text;
+        list.appendChild(li);
+      });
+    }
+
+    // ── Add handler ────────────────────────────────────────────────────────
+    function addTodo() {
+      const input = document.getElementById('new-todo');
+      const text = input.value.trim();
+
+      if (!text || text.length > 200) return;
+
+      todos.push(createTodo(text));
+      input.value = '';
+      input.focus();
+      render();
+    }
+
+    // ── Event listeners ────────────────────────────────────────────────────
+    document.getElementById('new-todo').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') addTodo();
+    });
+
+    document.getElementById('add-btn').addEventListener('click', addTodo);
+
+    // ── Init ───────────────────────────────────────────────────────────────
+    render();
+  </script>
+
+</body>
+</html>
