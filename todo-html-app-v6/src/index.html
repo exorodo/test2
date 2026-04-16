@@ -141,6 +141,22 @@
       background: #fdecea;
     }
 
+    /* Checkbox */
+    .todo-check {
+      width: 17px;
+      height: 17px;
+      margin-right: 10px;
+      cursor: pointer;
+      accent-color: #c0392b;
+      flex-shrink: 0;
+    }
+
+    /* Completed item */
+    .todo-item.completed .todo-item-text {
+      text-decoration: line-through;
+      color: #aaa;
+    }
+
     /* Empty state */
     .empty-state {
       text-align: center;
@@ -214,19 +230,26 @@
 
       todos.forEach(todo => {
         const li = document.createElement('li');
-        li.className = 'todo-item';
+        li.className = 'todo-item' + (todo.completed ? ' completed' : '');
         li.dataset.id = todo.id;
+
+        // Task 2.1: checkbox before text
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.className = 'todo-check';
+        checkbox.setAttribute('aria-label', 'Mark complete');
+        checkbox.checked = todo.completed;
 
         const span = document.createElement('span');
         span.className = 'todo-item-text';
         span.textContent = todo.text;
 
-        // Task 1.2: delete button per item
         const btn = document.createElement('button');
         btn.className = 'todo-delete';
         btn.setAttribute('aria-label', 'Delete todo');
         btn.textContent = '×';
 
+        li.appendChild(checkbox);
         li.appendChild(span);
         li.appendChild(btn);
         list.appendChild(li);
@@ -247,28 +270,30 @@
       render();
     }
 
-    // ── Delete handler (Tasks 3.1–3.6) ────────────────────────────────────
-    // Event delegation: single listener on the list container
+    // ── List event delegation (delete + toggle) ───────────────────────────
     document.getElementById('todo-list').addEventListener('click', function (e) {
-      // Task 3.2: check if click target is a delete button
-      if (!e.target.matches('.todo-delete')) return;
-
-      // Task 3.3: find parent .todo-item and get its id
       const li = e.target.closest('.todo-item');
       if (!li) return;
       const id = li.dataset.id;
 
-      // Task 3.4: remove from todos array
-      todos = todos.filter(t => t.id !== id);
+      // Delete
+      if (e.target.matches('.todo-delete')) {
+        todos = todos.filter(t => t.id !== id);
+        saveTodos();
+        li.remove();
+        if (todos.length === 0) render();
+        return;
+      }
 
-      // Task 3.5: save to localStorage
-      saveTodos();
-
-      // Task 3.6: remove DOM element
-      li.remove();
-
-      // Task 4.1: show empty state if needed
-      if (todos.length === 0) render();
+      // Toggle complete (Tasks 3.1–3.6)
+      if (e.target.matches('.todo-check')) {
+        const todo = todos.find(t => t.id === id);
+        if (!todo) return;
+        todo.completed = !todo.completed;       // 3.3 toggle in array
+        saveTodos();                             // 3.4 persist
+        li.classList.toggle('completed', todo.completed);  // 3.5 DOM class
+        e.target.checked = todo.completed;      // 3.6 sync checkbox
+      }
     });
 
     // ── Event listeners ────────────────────────────────────────────────────
