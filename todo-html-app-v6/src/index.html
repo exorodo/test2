@@ -182,6 +182,13 @@
       font-weight: 600;
     }
 
+    /* Todo count footer */
+    #todo-count {
+      padding: 8px 12px;
+      color: #666;
+      font-size: 14px;
+    }
+
     /* Empty state */
     .empty-state {
       text-align: center;
@@ -209,6 +216,8 @@
     </div>
 
     <ul id="todo-list"></ul>
+
+    <div id="todo-count"></div>
 
     <div class="filter-bar">
       <button class="filter-btn active" data-filter="all">All</button>
@@ -256,6 +265,9 @@
     function render() {
       const list = document.getElementById('todo-list');
       list.innerHTML = '';
+
+      const activeCount = todos.filter(t => !t.completed).length;
+      document.getElementById('todo-count').textContent = activeCount === 1 ? '1 item left' : activeCount + ' items left';
 
       const filtered = getFilteredTodos();
       if (filtered.length === 0) {
@@ -318,8 +330,7 @@
       if (e.target.matches('.todo-delete')) {
         todos = todos.filter(t => t.id !== id);
         saveTodos();
-        li.remove();
-        if (todos.length === 0) render();
+        render();
         return;
       }
 
