@@ -157,6 +157,31 @@
       color: #aaa;
     }
 
+    /* Filter bar */
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin: 16px 0 4px;
+    }
+
+    .filter-btn {
+      padding: 4px 14px;
+      border: 1.5px solid #ddd;
+      border-radius: 20px;
+      background: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: #555;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .filter-btn.active {
+      border-color: #c0392b;
+      color: #c0392b;
+      font-weight: 600;
+    }
+
     /* Empty state */
     .empty-state {
       text-align: center;
@@ -184,6 +209,12 @@
     </div>
 
     <ul id="todo-list"></ul>
+
+    <div class="filter-bar">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="active">Active</button>
+      <button class="filter-btn" data-filter="completed">Completed</button>
+    </div>
   </main>
 
   <!-- === SCRIPT === -->
@@ -192,6 +223,13 @@
 
     // ── State ──────────────────────────────────────────────────────────────
     let todos = [];
+    let currentFilter = 'all'; // 'all' | 'active' | 'completed'
+
+    function getFilteredTodos() {
+      if (currentFilter === 'active')    return todos.filter(t => !t.completed);
+      if (currentFilter === 'completed') return todos.filter(t => t.completed);
+      return todos;
+    }
 
     function createTodo(text) {
       return {
@@ -219,16 +257,16 @@
       const list = document.getElementById('todo-list');
       list.innerHTML = '';
 
-      // Task 4.1: empty state when no todos
-      if (todos.length === 0) {
+      const filtered = getFilteredTodos();
+      if (filtered.length === 0) {
         const empty = document.createElement('li');
         empty.className = 'empty-state';
-        empty.textContent = 'No todos yet. Add one above!';
+        empty.textContent = todos.length === 0 ? 'No todos yet. Add one above!' : 'No todos match this filter.';
         list.appendChild(empty);
         return;
       }
 
-      todos.forEach(todo => {
+      filtered.forEach(todo => {
         const li = document.createElement('li');
         li.className = 'todo-item' + (todo.completed ? ' completed' : '');
         li.dataset.id = todo.id;
@@ -285,15 +323,23 @@
         return;
       }
 
-      // Toggle complete (Tasks 3.1–3.6)
+      // Toggle complete
       if (e.target.matches('.todo-check')) {
         const todo = todos.find(t => t.id === id);
         if (!todo) return;
-        todo.completed = !todo.completed;       // 3.3 toggle in array
-        saveTodos();                             // 3.4 persist
-        li.classList.toggle('completed', todo.completed);  // 3.5 DOM class
-        e.target.checked = todo.completed;      // 3.6 sync checkbox
+        todo.completed = !todo.completed;
+        saveTodos();
+        render(); // re-render so active filter is respected
       }
+    });
+
+    // ── Filter bar ────────────────────────────────────────────────────────
+    document.querySelector('.filter-bar').addEventListener('click', function (e) {
+      const btn = e.target.closest('.filter-btn');
+      if (!btn) return;
+      currentFilter = btn.dataset.filter;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b === btn));
+      render();
     });
 
     // ── Event listeners ────────────────────────────────────────────────────
